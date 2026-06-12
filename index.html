@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Podcast Review Challenge</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --bg:          #0f1117;
+  --surface:     #1a1d27;
+  --surface2:    #22263a;
+  --border:      #2e3350;
+  --accent:      #6c63ff;
+  --accent-glow: rgba(108,99,255,.18);
+  --accent2:     #00d2a0;
+  --text:        #e8eaf6;
+  --muted:       #7b80a0;
+  --done:        #00d2a0;
+  --done-bg:     rgba(0,210,160,.08);
+  --err:         #e05555;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── SCREENS ── */
+.screen{display:none;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ── SHARED CARD ── */
+.center-wrap{
+  min-height:100vh;display:flex;align-items:center;
+  justify-content:center;padding:1.5rem;
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:440px;
+}
+.card-icon{font-size:2.6rem;display:block;text-align:center;
+  margin-bottom:.9rem;filter:drop-shadow(0 0 14px var(--accent));}
+.card h1{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;
+  text-align:center;margin-bottom:.35rem;letter-spacing:-.02em;}
+.card .sub{color:var(--muted);font-size:.88rem;text-align:center;margin-bottom:1.6rem;}
+
+/* ── STUDENT GRID ── */
+.student-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:.55rem;
+  max-height:280px;overflow-y:auto;margin-bottom:1rem;padding-right:3px;
+}
+.student-grid::-webkit-scrollbar{width:4px;}
+.student-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+.s-btn{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Inter',sans-serif;font-size:.83rem;font-weight:500;
+  padding:.65rem .4rem;cursor:pointer;transition:all .16s;text-align:center;line-height:1.3;
+}
+.s-btn:hover{border-color:var(--accent);background:var(--accent-glow);}
+.s-btn.selected{border-color:var(--accent);background:var(--accent-glow);
+  box-shadow:0 0 0 2px var(--accent);}
+
+/* ── PIN INPUT ── */
+.pin-wrap{margin-bottom:1rem;}
+.pin-wrap label{display:block;font-size:.78rem;font-weight:600;
+  color:var(--muted);margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase;}
+.pin-wrap input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:1rem;font-weight:600;
+  padding:.7rem 1rem;letter-spacing:.2em;outline:none;transition:border .15s;
+  font-family:'Inter',sans-serif;
+}
+.pin-wrap input:focus{border-color:var(--accent);}
+.pin-wrap input::placeholder{letter-spacing:.05em;color:var(--muted);font-weight:400;}
+
+/* ── ERROR MSG ── */
+.err-msg{
+  background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.3);
+  border-radius:8px;color:var(--err);font-size:.82rem;font-weight:500;
+  padding:.55rem .9rem;margin-bottom:.9rem;text-align:center;display:none;
+}
+.err-msg.show{display:block;}
+
+/* ── PRIMARY BUTTON ── */
+.btn-primary{
+  width:100%;background:var(--accent);border:none;border-radius:12px;
+  color:#fff;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;
+  padding:.85rem;cursor:pointer;transition:opacity .16s,transform .1s;letter-spacing:.02em;
+}
+.btn-primary:disabled{opacity:.32;cursor:not-allowed;}
+.btn-primary:not(:disabled):hover{opacity:.87;transform:translateY(-1px);}
+
+/* ── SPINNER ── */
+.spinner{
+  display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════════════════════════
+   MAIN SCREEN
+══════════════════════════════ */
+#mainScreen{min-height:100vh;}
+#mainScreen.active{display:block;}
+
+header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:.9rem 1.4rem;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:10;
+}
+.h-left{display:flex;align-items:center;gap:.6rem;font-size:.95rem;}
+.h-left span{font-size:1.2rem;}
+#headerName{font-family:'Space Grotesk',sans-serif;font-weight:700;}
+
+.prog-wrap{flex:1;max-width:180px;margin:0 1rem;}
+.prog-label{font-size:.7rem;color:var(--muted);margin-bottom:3px;text-align:right;}
+.prog-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+
+#switchBtn{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:.75rem;font-weight:500;padding:.38rem .75rem;
+  cursor:pointer;transition:all .14s;
+}
+#switchBtn:hover{color:var(--text);border-color:var(--muted);}
+
+.main-content{max-width:920px;margin:0 auto;padding:1.8rem 1.2rem 3rem;}
+.section-label{
+  font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.9rem;
+}
+
+/* ── CHAPTER GRID ── */
+.ch-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));
+  gap:.75rem;margin-bottom:2rem;
+}
+.ch-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:1.1rem 1rem;position:relative;
+  overflow:hidden;transition:all .2s;
+}
+.ch-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--border);transition:background .2s;
+}
+.ch-card.done{border-color:rgba(0,210,160,.25);background:var(--done-bg);}
+.ch-card.done::before{background:var(--done);}
+.ch-card:not(.done):hover{
+  border-color:var(--accent);transform:translateY(-2px);
+  box-shadow:0 6px 22px rgba(108,99,255,.13);
+}
+.ch-card:not(.done):hover::before{background:var(--accent);}
+
+.ch-num{font-size:.68rem;font-weight:700;letter-spacing:.1em;
+  color:var(--muted);text-transform:uppercase;margin-bottom:.25rem;}
+.ch-title{font-family:'Space Grotesk',sans-serif;font-size:.93rem;
+  font-weight:600;margin-bottom:.75rem;line-height:1.3;}
+.ch-card.done .ch-title{color:var(--done);}
+.done-badge{position:absolute;top:.75rem;right:.8rem;font-size:.95rem;}
+
+.card-btns{display:flex;gap:.45rem;flex-wrap:wrap;}
+.btn-quiz{
+  flex:1;background:var(--accent);border:none;border-radius:8px;color:#fff;
+  font-size:.76rem;font-weight:600;padding:.42rem .5rem;cursor:pointer;
+  transition:opacity .14s;white-space:nowrap;
+}
+.btn-quiz:hover{opacity:.84;}
+.btn-quiz.secondary{background:var(--surface2);color:var(--muted);}
+.btn-mark{
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  color:var(--muted);font-size:.76rem;font-weight:600;padding:.42rem .65rem;
+  cursor:pointer;transition:all .14s;white-space:nowrap;
+}
+.btn-mark:hover{border-color:var(--done);color:var(--done);}
+.btn-mark.done-state{
+  border-color:var(--done);color:var(--done);
+  background:rgba(0,210,160,.08);cursor:default;
+}
+
+/* ── FINAL CARD ── */
+.final-card{
+  border-radius:16px;padding:1.5rem;display:flex;
+  align-items:center;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;
+}
+.final-card.locked{background:var(--surface);border:1px dashed var(--border);}
+.final-card.unlocked{
+  background:linear-gradient(135deg,rgba(108,99,255,.14),rgba(0,210,160,.09));
+  border:1px solid rgba(108,99,255,.4);
+  box-shadow:0 0 36px rgba(108,99,255,.1);
+}
+.final-info h2{font-family:'Space Grotesk',sans-serif;
+  font-size:1.1rem;font-weight:700;margin-bottom:.3rem;}
+.final-info p{font-size:.82rem;color:var(--muted);}
+.final-card.unlocked .final-info p{color:var(--accent2);}
+.final-left{display:flex;align-items:center;gap:.7rem;}
+.lock-ico{font-size:1.9rem;}
+.btn-final{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;
+  border-radius:12px;color:#fff;font-family:'Space Grotesk',sans-serif;
+  font-size:.92rem;font-weight:700;padding:.7rem 1.4rem;cursor:pointer;
+  transition:opacity .16s,transform .1s;white-space:nowrap;
+}
+.btn-final:hover{opacity:.87;transform:translateY(-1px);}
+.btn-final:disabled{background:var(--border);color:var(--muted);
+  cursor:not-allowed;transform:none;opacity:1;}
+
+/* ── SYNC STATUS ── */
+.sync-bar{
+  font-size:.72rem;color:var(--muted);text-align:center;
+  padding:.4rem;margin-top:1.5rem;
+}
+.sync-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--done);margin-right:5px;vertical-align:middle;
+}
+.sync-dot.err{background:var(--err);}
+.sync-dot.busy{background:var(--warn,#f5a623);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.8rem;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--surface2);border:1px solid var(--done);color:var(--done);
+  border-radius:10px;padding:.6rem 1.1rem;font-size:.83rem;font-weight:600;
+  opacity:0;transition:all .28s;z-index:200;pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err-toast{border-color:var(--err);color:var(--err);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:100;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:2rem;max-width:340px;width:90%;text-align:center;
+}
+.modal h3{font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;}
+.modal p{color:var(--muted);font-size:.84rem;margin-bottom:1.3rem;}
+.modal-btns{display:flex;gap:.6rem;}
+.modal-btns button{
+  flex:1;padding:.62rem;border-radius:10px;font-weight:600;
+  font-size:.86rem;cursor:pointer;border:none;transition:opacity .14s;
+}
+.modal-btns button:hover{opacity:.8;}
+#confirmSwitch{background:#e05555;color:#fff;}
+#cancelSwitch{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+
+@media(max-width:500px){
+  .ch-grid{grid-template-columns:1fr 1fr;}
+  .prog-wrap{display:none;}
+  .final-card{flex-direction:column;text-align:center;}
+  .final-left{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     ⚙️  CONFIGURATION  —  edit only this block
+════════════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+  // ── Paste your deployed Apps Script Web App URL here ──────
+  scriptUrl: "https://script.google.com/macros/s/YOhttps://script.google.com/macros/s/AKfycbzV7b5yRcdoAFA3LmEh3AYBAhwSJEo-H7oWlNAjWVmwHGPiXVATCY68NpH4IlGP-Y5eIg/execUR_DEPLOYMENT_ID/exec",
+
+  courseTitle:    "Podcast Review Challenge",
+  courseSubtitle: "Listen → Quiz → Unlock the Final Exam",
+
+  // ── Students: name + PIN ──────────────────────────────────
+  // PINs can be any string (numbers recommended for mobile ease).
+  // Share each student's PIN with them privately.
+  students: [
+    { name: "Alice M.",   pin: "1001" },
+    { name: "Bob T.",     pin: "1002" },
+    { name: "Carlos R.",  pin: "1003" },
+    { name: "Diana K.",   pin: "1004" },
+    { name: "Ethan J.",   pin: "1005" },
+    { name: "Fatima S.",  pin: "1006" },
+    { name: "Grace L.",   pin: "1007" },
+    { name: "Henry W.",   pin: "1008" },
+    { name: "Isabella P.",pin: "1009" },
+    { name: "James C.",   pin: "1010" },
+    { name: "Karen N.",   pin: "1011" },
+    { name: "Liam B.",    pin: "1012" },
+    { name: "Mia F.",     pin: "1013" },
+    { name: "Noah G.",    pin: "1014" },
+    { name: "Olivia H.",  pin: "1015" },
+    { name: "Pablo D.",   pin: "1016" },
+    { name: "Quinn A.",   pin: "1017" },
+    { name: "Rachel E.",  pin: "1018" },
+    { name: "Sam V.",     pin: "1019" },
+    { name: "Tina O.",    pin: "1020" },
+    { name: "Ursula Y.",  pin: "1021" },
+    { name: "Victor Z.",  pin: "1022" },
+    { name: "Wendy X.",   pin: "1023" },
+    { name: "Xander U.",  pin: "1024" },
+    { name: "Yara I.",    pin: "1025" },
+    { name: "Zack Q.",    pin: "1026" },
+  ],
+
+  // ── 17 chapters ──────────────────────────────────────────
+  // Replace googleFormUrl with your real Google Form links.
+  // podcastUrl is optional — set to "" to hide the Listen button.
+  chapters: [
+    { title: "Chapter 1",  googleFormUrl: "https://forms.gle/your-form-1",  podcastUrl: "" },
+    { title: "Chapter 2",  googleFormUrl: "https://forms.gle/your-form-2",  podcastUrl: "" },
+    { title: "Chapter 3",  googleFormUrl: "https://forms.gle/your-form-3",  podcastUrl: "" },
+    { title: "Chapter 4",  googleFormUrl: "https://forms.gle/your-form-4",  podcastUrl: "" },
+    { title: "Chapter 5",  googleFormUrl: "https://forms.gle/your-form-5",  podcastUrl: "" },
+    { title: "Chapter 6",  googleFormUrl: "https://forms.gle/your-form-6",  podcastUrl: "" },
+    { title: "Chapter 7",  googleFormUrl: "https://forms.gle/your-form-7",  podcastUrl: "" },
+    { title: "Chapter 8",  googleFormUrl: "https://forms.gle/your-form-8",  podcastUrl: "" },
+    { title: "Chapter 9",  googleFormUrl: "https://forms.gle/your-form-9",  podcastUrl: "" },
+    { title: "Chapter 10", googleFormUrl: "https://forms.gle/your-form-10", podcastUrl: "" },
+    { title: "Chapter 11", googleFormUrl: "https://forms.gle/your-form-11", podcastUrl: "" },
+    { title: "Chapter 12", googleFormUrl: "https://forms.gle/your-form-12", podcastUrl: "" },
+    { title: "Chapter 13", googleFormUrl: "https://forms.gle/your-form-13", podcastUrl: "" },
+    { title: "Chapter 14", googleFormUrl: "https://forms.gle/your-form-14", podcastUrl: "" },
+    { title: "Chapter 15", googleFormUrl: "https://forms.gle/your-form-15", podcastUrl: "" },
+    { title: "Chapter 16", googleFormUrl: "https://forms.gle/your-form-16", podcastUrl: "" },
+    { title: "Chapter 17", googleFormUrl: "https://forms.gle/your-form-17", podcastUrl: "" },
+  ],
+
+  finalExamUrl: "https://forms.gle/your-final-exam",
+};
+</script>
+<!-- ════════════════════════════════════════════════
+     End of configuration
+════════════════════════════════════════════════ -->
+
+<!-- ── SCREEN 1: STUDENT SELECT ── -->
+<div id="selectScreen" class="screen active">
+  <div class="center-wrap">
+    <div class="card">
+      <span class="card-icon">🎙️</span>
+      <h1 id="selectTitle"></h1>
+      <p class="sub">Select your name</p>
+      <div class="student-grid" id="studentGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: PIN ENTRY ── -->
+<div id="pinScreen" class="screen">
+  <div class="center-wrap">
+    <div class="card">
+      <span class="card-icon">🔐</span>
+      <h1 id="pinGreeting">Enter your PIN</h1>
+      <p class="sub" id="pinSub">Enter the PIN your teacher gave you</p>
+      <div class="err-msg" id="pinErr">Incorrect PIN — try again</div>
+      <div class="pin-wrap">
+        <label>PIN</label>
+        <input type="password" inputmode="numeric" id="pinInput"
+               placeholder="••••" maxlength="10" autocomplete="off"/>
+      </div>
+      <button class="btn-primary" id="pinBtn">Continue →</button>
+      <div style="text-align:center;margin-top:.9rem;">
+        <button id="backBtn" style="background:none;border:none;color:var(--muted);
+          font-size:.82rem;cursor:pointer;text-decoration:underline;">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: MAIN TRACKER ── -->
+<div id="mainScreen" class="screen">
+  <header>
+    <div class="h-left">
+      <span>🎙️</span>
+      <span id="headerName"></span>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-label" id="progLabel">0 / 17</div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+    <button id="switchBtn">⇄ Switch</button>
+  </header>
+
+  <div class="main-content">
+    <div class="section-label">Chapter Quizzes</div>
+    <div class="ch-grid" id="chGrid"></div>
+
+    <div class="section-label">Final Exam</div>
+    <div class="final-card locked" id="finalCard">
+      <div class="final-left">
+        <span class="lock-ico" id="lockIco">🔒</span>
+        <div class="final-info">
+          <h2>Final Exam</h2>
+          <p id="finalSub">Complete all 17 chapter quizzes to unlock</p>
+        </div>
+      </div>
+      <button class="btn-final" id="finalBtn" disabled>Locked</button>
+    </div>
+
+    <div class="sync-bar" id="syncBar">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncMsg">Synced</span>
+    </div>
+  </div>
+</div>
+
+<!-- SWITCH MODAL -->
+<div class="modal-overlay" id="switchModal">
+  <div class="modal">
+    <h3>Switch Student?</h3>
+    <p>Your progress is saved in the cloud. You can come back on any device.</p>
+    <div class="modal-btns">
+      <button id="cancelSwitch">Stay</button>
+      <button id="confirmSwitch">Switch</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════
+const TOTAL = CONFIG.chapters.length;
+let session = { student: null, pin: null, done: [], finalTaken: false };
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+let toastTimer;
+function toast(msg, isErr = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('err-toast', isErr);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function setSyncStatus(state, msg) {
+  // state: 'ok' | 'busy' | 'err'
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncMsg');
+  dot.className = 'sync-dot' + (state === 'ok' ? '' : state === 'err' ? ' err' : ' busy');
+  txt.textContent = msg;
+}
+
+async function api(params) {
+  const url = CONFIG.scriptUrl + '?' + new URLSearchParams(params).toString();
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error('Network error');
+  return res.json();
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 1 — STUDENT SELECT
+// ═══════════════════════════════════════════════
+function buildSelectScreen() {
+  document.getElementById('selectTitle').textContent = CONFIG.courseTitle;
+  const grid = document.getElementById('studentGrid');
+  grid.innerHTML = '';
+
+  CONFIG.students.forEach(({ name }) => {
+    const btn = document.createElement('button');
+    btn.className = 's-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => {
+      session.student = name;
+      document.getElementById('pinGreeting').textContent = `Hi, ${name.split(' ')[0]}!`;
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinErr').classList.remove('show');
+      showScreen('pinScreen');
+      document.getElementById('pinInput').focus();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 2 — PIN ENTRY
+// ═══════════════════════════════════════════════
+async function handlePinSubmit() {
+  const pin    = document.getElementById('pinInput').value.trim();
+  const errEl  = document.getElementById('pinErr');
+  const btn    = document.getElementById('pinBtn');
+
+  if (!pin) return;
+
+  // Local PIN check first (fast, no round-trip needed)
+  const studentCfg = CONFIG.students.find(s => s.name === session.student);
+  if (!studentCfg || pin !== studentCfg.pin) {
+    errEl.textContent = 'Incorrect PIN — try again';
+    errEl.classList.add('show');
+    return;
+  }
+
+  errEl.classList.remove('show');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Loading…';
+  session.pin = pin;
+
+  try {
+    // Register / login with Apps Script
+    const loginRes = await api({ action: 'login', student: session.student, pin });
+    if (!loginRes.ok) throw new Error(loginRes.error || 'Login failed');
+
+    // Fetch progress
+    const prog = await api({ action: 'getProgress', student: session.student, pin });
+    if (!prog.ok) throw new Error(prog.error || 'Failed to load progress');
+
+    session.done       = prog.done || [];
+    session.finalTaken = prog.finalTaken || false;
+
+    document.getElementById('headerName').textContent = session.student;
+    showScreen('mainScreen');
+    renderMain();
+  } catch (e) {
+    errEl.textContent = e.message || 'Connection error — check your internet';
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue →';
+  }
+}
+
+document.getElementById('pinBtn').addEventListener('click', handlePinSubmit);
+document.getElementById('pinInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handlePinSubmit();
+});
+document.getElementById('backBtn').addEventListener('click', () => {
+  showScreen('selectScreen');
+});
+
+// ═══════════════════════════════════════════════
+//  SCREEN 3 — MAIN TRACKER
+// ═══════════════════════════════════════════════
+function renderMain() {
+  const count   = session.done.length;
+  const allDone = count >= TOTAL;
+
+  // Progress bar
+  document.getElementById('progLabel').textContent = `${count} / ${TOTAL}`;
+  document.getElementById('progFill').style.width  = `${(count / TOTAL) * 100}%`;
+
+  // Chapter cards
+  const grid = document.getElementById('chGrid');
+  grid.innerHTML = '';
+
+  CONFIG.chapters.forEach((ch, i) => {
+    const isDone = session.done.includes(i);
+    const hasPod = ch.podcastUrl && ch.podcastUrl.trim() !== '';
+    const card   = document.createElement('div');
+    card.className = `ch-card${isDone ? ' done' : ''}`;
+
+    card.innerHTML = `
+      <div class="ch-num">Quiz ${i + 1}</div>
+      <div class="ch-title">${ch.title}</div>
+      ${isDone ? '<span class="done-badge">✅</span>' : ''}
+      <div class="card-btns">
+        ${hasPod ? `<button class="btn-quiz secondary" onclick="window.open('${ch.podcastUrl}','_blank')">🎧 Listen</button>` : ''}
+        <button class="btn-quiz" onclick="window.open('${ch.googleFormUrl}','_blank')" ${isDone ? 'disabled' : ''}>
+          ${isDone ? '✓ Submitted' : '📝 Quiz'}
+        </button>
+        ${!isDone
+          ? `<button class="btn-mark" onclick="markChapterDone(${i})">Mark done ✓</button>`
+          : `<button class="btn-mark done-state" disabled>Done ✓</button>`
+        }
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Final exam card
+  const finalCard = document.getElementById('finalCard');
+  const finalBtn  = document.getElementById('finalBtn');
+  const lockIco   = document.getElementById('lockIco');
+  const finalSub  = document.getElementById('finalSub');
+
+  if (allDone) {
+    finalCard.className = 'final-card unlocked';
+    lockIco.textContent = '🏆';
+    finalSub.textContent = session.finalTaken
+      ? 'You\'ve already taken the final exam — well done!'
+      : 'All chapters complete — you\'re ready!';
+    finalBtn.disabled   = false;
+    finalBtn.textContent = session.finalTaken ? '📄 Retake Final' : 'Take Final Exam →';
+    finalBtn.onclick    = () => {
+      window.open(CONFIG.finalExamUrl, '_blank');
+      markFinalTaken();
+    };
+  } else {
+    finalCard.className  = 'final-card locked';
+    lockIco.textContent  = '🔒';
+    finalSub.textContent = `Complete all 17 quizzes to unlock (${count} done)`;
+    finalBtn.disabled    = true;
+    finalBtn.textContent = 'Locked';
+    finalBtn.onclick     = null;
+  }
+
+  setSyncStatus('ok', 'Synced with Google Sheets');
+}
+
+async function markChapterDone(index) {
+  if (session.done.includes(index)) return;
+  setSyncStatus('busy', 'Saving…');
+
+  try {
+    const res = await api({
+      action:  'markDone',
+      student:  session.student,
+      pin:      session.pin,
+      chapter:  index
+    });
+    if (!res.ok) throw new Error(res.error);
+
+    session.done.push(index);
+    toast(`✅ ${CONFIG.chapters[index].title} marked complete!`);
+    setSyncStatus('ok', 'Synced with Google Sheets');
+    renderMain();
+  } catch (e) {
+    setSyncStatus('err', 'Sync failed — check connection');
+    toast('Could not save — try again', true);
+  }
+}
+
+async function markFinalTaken() {
+  if (session.finalTaken) return;
+  try {
+    await api({ action: 'markDone', student: session.student, pin: session.pin, final: 'true' });
+    session.finalTaken = true;
+    renderMain();
+  } catch (_) {}
+}
+
+// ── SWITCH STUDENT ────────────────────────────
+document.getElementById('switchBtn').addEventListener('click', () => {
+  document.getElementById('switchModal').classList.add('open');
+});
+document.getElementById('cancelSwitch').addEventListener('click', () => {
+  document.getElementById('switchModal').classList.remove('open');
+});
+document.getElementById('confirmSwitch').addEventListener('click', () => {
+  document.getElementById('switchModal').classList.remove('open');
+  session = { student: null, pin: null, done: [], finalTaken: false };
+  buildSelectScreen();
+  showScreen('selectScreen');
+});
+
+// ── INIT ──────────────────────────────────────
+buildSelectScreen();
+</script>
+</body>
+</html>
