@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Podcast Review Challenge</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #6c63ff;
+    --accent-glow: rgba(108,99,255,0.18);
+    --accent2: #00d2a0;
+    --text: #e8eaf6;
+    --muted: #7b80a0;
+    --done: #00d2a0;
+    --done-bg: rgba(0,210,160,0.08);
+    --locked: #2e3350;
+    --warn: #f5a623;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #loginScreen.active { display: flex; }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+  }
+
+  .logo-icon {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    display: block;
+    filter: drop-shadow(0 0 16px var(--accent));
+  }
+
+  .login-card h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+    letter-spacing: -0.02em;
+  }
+
+  .login-card p {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .student-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 1.2rem;
+    padding-right: 4px;
+  }
+
+  .student-grid::-webkit-scrollbar { width: 4px; }
+  .student-grid::-webkit-scrollbar-track { background: transparent; }
+  .student-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .student-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    padding: .7rem .5rem;
+    cursor: pointer;
+    transition: all .18s;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .student-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: #fff;
+  }
+  .student-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: #fff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .progress-pill {
+    display: inline-block;
+    font-size: .7rem;
+    color: var(--accent2);
+    background: rgba(0,210,160,0.1);
+    border-radius: 20px;
+    padding: 2px 8px;
+    margin-top: 3px;
+  }
+
+  #enterBtn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: .85rem;
+    cursor: pointer;
+    transition: opacity .18s, transform .1s;
+    letter-spacing: .02em;
+  }
+  #enterBtn:disabled { opacity: .35; cursor: not-allowed; }
+  #enterBtn:not(:disabled):hover { opacity: .88; transform: translateY(-1px); }
+
+  /* ── MAIN SCREEN ── */
+  #mainScreen { min-height: 100vh; padding-bottom: 3rem; }
+  #mainScreen.active { display: block; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-left { display: flex; align-items: center; gap: .7rem; }
+  .header-left span { font-size: 1.3rem; }
+
+  #headerName {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    max-width: 200px;
+    margin: 0 1.2rem;
+  }
+  .progress-bar-label {
+    font-size: .72rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-align: right;
+  }
+  .progress-bar-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  #switchBtn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 500;
+    padding: .4rem .8rem;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #switchBtn:hover { color: var(--text); border-color: var(--muted); }
+
+  .main-content { max-width: 900px; margin: 0 auto; padding: 2rem 1.2rem; }
+
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  /* ── CHAPTER GRID ── */
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: .8rem;
+    margin-bottom: 2rem;
+  }
+
+  .chapter-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem 1rem;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chapter-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    transition: background .2s;
+  }
+
+  .chapter-card.done::before { background: var(--done); }
+  .chapter-card.done {
+    border-color: rgba(0,210,160,.25);
+    background: var(--done-bg);
+  }
+
+  .chapter-card:not(.done):hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(108,99,255,.12);
+  }
+  .chapter-card:not(.done):hover::before { background: var(--accent); }
+
+  .chapter-num {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: .3rem;
+  }
+
+  .chapter-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    margin-bottom: .8rem;
+    line-height: 1.3;
+  }
+
+  .chapter-card.done .chapter-title { color: var(--done); }
+
+  .card-actions {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-quiz {
+    flex: 1;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: .45rem .6rem;
+    cursor: pointer;
+    transition: opacity .15s;
+    white-space: nowrap;
+  }
+  .btn-quiz:hover { opacity: .85; }
+  .chapter-card.done .btn-quiz { background: var(--surface2); color: var(--muted); }
+
+  .btn-done {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 600;
+    padding: .45rem .7rem;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .btn-done:hover { border-color: var(--done); color: var(--done); }
+  .chapter-card.done .btn-done {
+    border-color: var(--done);
+    color: var(--done);
+    background: rgba(0,210,160,.08);
+    cursor: default;
+  }
+
+  .done-badge {
+    position: absolute;
+    top: .8rem;
+    right: .8rem;
+    font-size: 1rem;
+  }
+
+  /* ── FINAL EXAM ── */
+  .final-section { margin-top: 1.5rem; }
+
+  .final-card {
+    border-radius: 16px;
+    padding: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .final-card.locked {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+  }
+
+  .final-card.unlocked {
+    background: linear-gradient(135deg, rgba(108,99,255,.15), rgba(0,210,160,.1));
+    border: 1px solid rgba(108,99,255,.4);
+    box-shadow: 0 0 40px rgba(108,99,255,.1);
+  }
+
+  .final-info h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: .3rem;
+  }
+  .final-info p {
+    font-size: .83rem;
+    color: var(--muted);
+  }
+  .final-card.unlocked .final-info p { color: var(--accent2); }
+
+  .btn-final {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    padding: .75rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .18s, transform .1s;
+    white-space: nowrap;
+  }
+  .btn-final:hover { opacity: .88; transform: translateY(-1px); }
+  .btn-final:disabled {
+    background: var(--border);
+    color: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 1;
+  }
+
+  .lock-icon { font-size: 2rem; margin-right: .5rem; }
+
+  /* ── RESET CONFIRM MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 360px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal h3 { font-family: 'Space Grotesk', sans-serif; margin-bottom: .6rem; }
+  .modal p { color: var(--muted); font-size: .85rem; margin-bottom: 1.4rem; }
+  .modal-actions { display: flex; gap: .7rem; }
+  .modal-actions button {
+    flex: 1; padding: .65rem; border-radius: 10px; font-weight: 600;
+    font-size: .88rem; cursor: pointer; border: none; transition: opacity .15s;
+  }
+  .modal-actions button:hover { opacity: .8; }
+  #confirmReset { background: #e05555; color: #fff; }
+  #cancelReset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2);
+    border: 1px solid var(--done);
+    color: var(--done);
+    border-radius: 10px;
+    padding: .65rem 1.2rem;
+    font-size: .85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all .3s;
+    z-index: 200;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 520px) {
+    .chapters-grid { grid-template-columns: 1fr 1fr; }
+    .progress-bar-wrap { display: none; }
+    .final-card { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     ⚙️  CONFIGURATION — edit this section only
+═══════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+  courseTitle: "Podcast Review Challenge",
+  courseSubtitle: "Complete all 17 chapter quizzes to unlock the Final Exam",
+
+  // ── Student names ─────────────────────────
+  // Add or remove names here.
+  students: [
+    "Alice M.", "Bob T.", "Carlos R.", "Diana K.",
+    "Ethan J.", "Fatima S.", "Grace L.", "Henry W.",
+    "Isabella P.", "James C.", "Karen N.", "Liam B.",
+    "Mia F.", "Noah G.", "Olivia H.", "Pablo D.",
+    "Quinn A.", "Rachel E.", "Sam V.", "Tina O.",
+    "Ursula Y.", "Victor Z.", "Wendy X.", "Xander U.",
+    "Yara I.", "Zack Q."
+  ],
+
+  // ── Chapter definitions ───────────────────
+  // Replace the googleFormUrl values with your real Google Form links.
+  // The podcast links are optional; set to "" to hide the button.
+  chapters: [
+    { title: "Chapter 1", googleFormUrl: "https://forms.google.com/your-form-1", podcastUrl: "" },
+    { title: "Chapter 2", googleFormUrl: "https://forms.google.com/your-form-2", podcastUrl: "" },
+    { title: "Chapter 3", googleFormUrl: "https://forms.google.com/your-form-3", podcastUrl: "" },
+    { title: "Chapter 4", googleFormUrl: "https://forms.google.com/your-form-4", podcastUrl: "" },
+    { title: "Chapter 5", googleFormUrl: "https://forms.google.com/your-form-5", podcastUrl: "" },
+    { title: "Chapter 6", googleFormUrl: "https://forms.google.com/your-form-6", podcastUrl: "" },
+    { title: "Chapter 7", googleFormUrl: "https://forms.google.com/your-form-7", podcastUrl: "" },
+    { title: "Chapter 8", googleFormUrl: "https://forms.google.com/your-form-8", podcastUrl: "" },
+    { title: "Chapter 9", googleFormUrl: "https://forms.google.com/your-form-9", podcastUrl: "" },
+    { title: "Chapter 10", googleFormUrl: "https://forms.google.com/your-form-10", podcastUrl: "" },
+    { title: "Chapter 11", googleFormUrl: "https://forms.google.com/your-form-11", podcastUrl: "" },
+    { title: "Chapter 12", googleFormUrl: "https://forms.google.com/your-form-12", podcastUrl: "" },
+    { title: "Chapter 13", googleFormUrl: "https://forms.google.com/your-form-13", podcastUrl: "" },
+    { title: "Chapter 14", googleFormUrl: "https://forms.google.com/your-form-14", podcastUrl: "" },
+    { title: "Chapter 15", googleFormUrl: "https://forms.google.com/your-form-15", podcastUrl: "" },
+    { title: "Chapter 16", googleFormUrl: "https://forms.google.com/your-form-16", podcastUrl: "" },
+    { title: "Chapter 17", googleFormUrl: "https://forms.google.com/your-form-17", podcastUrl: "" },
+  ],
+
+  // ── Final exam ────────────────────────────
+  finalExamUrl: "https://forms.google.com/your-final-exam-form",
+};
+</script>
+<!-- ═══════════════════════════════════════════
+     End of configuration
+═══════════════════════════════════════════ -->
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="screen active">
+  <div class="login-card">
+    <span class="logo-icon">🎙️</span>
+    <h1 id="loginTitle">Podcast Review Challenge</h1>
+    <p id="loginSubtitle">Select your name to continue</p>
+    <div class="student-grid" id="studentGrid"></div>
+    <button id="enterBtn" disabled>Enter →</button>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="mainScreen" class="screen">
+  <header>
+    <div class="header-left">
+      <span>🎙️</span>
+      <span id="headerName"></span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label" id="progressLabel">0 / 17</div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+    <button id="switchBtn">⇄ Switch student</button>
+  </header>
+
+  <div class="main-content">
+    <div class="section-title">Chapter Quizzes</div>
+    <div class="chapters-grid" id="chaptersGrid"></div>
+
+    <div class="final-section">
+      <div class="section-title">Final Exam</div>
+      <div class="final-card locked" id="finalCard">
+        <div style="display:flex;align-items:center;">
+          <span class="lock-icon" id="lockIcon">🔒</span>
+          <div class="final-info">
+            <h2 id="finalTitle">Final Exam</h2>
+            <p id="finalSubtitle">Complete all 17 chapter quizzes to unlock</p>
+          </div>
+        </div>
+        <button class="btn-final" id="finalBtn" disabled>Locked</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET CONFIRM MODAL -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>Switch Student?</h3>
+    <p>You'll return to the student selection screen. Your progress is saved and will be there when you come back.</p>
+    <div class="modal-actions">
+      <button id="cancelReset">Stay</button>
+      <button id="confirmReset">Switch</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Helpers ──────────────────────────────────
+const TOTAL = CONFIG.chapters.length;
+let currentStudent = null;
+
+function storageKey(student) {
+  return `podcast_tracker__${student.replace(/\s+/g, '_')}`;
+}
+
+function loadProgress(student) {
+  try {
+    const raw = localStorage.getItem(storageKey(student));
+    return raw ? JSON.parse(raw) : { done: [] };
+  } catch { return { done: [] }; }
+}
+
+function saveProgress(student, data) {
+  localStorage.setItem(storageKey(student), JSON.stringify(data));
+}
+
+function getProgress(student) {
+  return loadProgress(student).done.length;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── LOGIN SCREEN ──────────────────────────────
+function buildLoginScreen() {
+  document.getElementById('loginTitle').textContent = CONFIG.courseTitle;
+  document.getElementById('loginSubtitle').textContent = CONFIG.courseSubtitle;
+
+  const grid = document.getElementById('studentGrid');
+  grid.innerHTML = '';
+  let selected = null;
+
+  CONFIG.students.forEach(name => {
+    const done = getProgress(name);
+    const btn = document.createElement('button');
+    btn.className = 'student-btn';
+    btn.innerHTML = `${name}${done > 0 ? `<br><span class="progress-pill">${done}/${TOTAL} done</span>` : ''}`;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.student-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selected = name;
+      document.getElementById('enterBtn').disabled = false;
+    });
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('enterBtn').disabled = true;
+  document.getElementById('enterBtn').onclick = () => {
+    if (selected) enterAs(selected);
+  };
+}
+
+// ── ENTER AS STUDENT ──────────────────────────
+function enterAs(student) {
+  currentStudent = student;
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('mainScreen').classList.add('active');
+  document.getElementById('headerName').textContent = student;
+  renderMain();
+}
+
+// ── MAIN SCREEN ───────────────────────────────
+function renderMain() {
+  const { done } = loadProgress(currentStudent);
+  const count = done.length;
+  const allDone = count >= TOTAL;
+
+  // Header progress
+  document.getElementById('progressLabel').textContent = `${count} / ${TOTAL}`;
+  document.getElementById('progressFill').style.width = `${(count / TOTAL) * 100}%`;
+
+  // Chapters grid
+  const grid = document.getElementById('chaptersGrid');
+  grid.innerHTML = '';
+
+  CONFIG.chapters.forEach((ch, i) => {
+    const isDone = done.includes(i);
+    const card = document.createElement('div');
+    card.className = `chapter-card${isDone ? ' done' : ''}`;
+
+    const hasPodcast = ch.podcastUrl && ch.podcastUrl.trim() !== '';
+
+    card.innerHTML = `
+      <div class="chapter-num">Quiz ${i + 1}</div>
+      <div class="chapter-title">${ch.title}</div>
+      ${isDone ? '<span class="done-badge">✅</span>' : ''}
+      <div class="card-actions">
+        ${hasPodcast ? `<button class="btn-quiz" style="background:var(--surface2);color:var(--muted);" onclick="window.open('${ch.podcastUrl}','_blank')">🎧 Listen</button>` : ''}
+        <button class="btn-quiz" onclick="window.open('${ch.googleFormUrl}','_blank')" ${isDone ? 'disabled' : ''}>
+          ${isDone ? '✓ Done' : '📝 Take Quiz'}
+        </button>
+        ${!isDone ? `<button class="btn-done" onclick="markDone(${i})">Mark done ✓</button>` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Final exam
+  const finalCard = document.getElementById('finalCard');
+  const finalBtn = document.getElementById('finalBtn');
+  const lockIcon = document.getElementById('lockIcon');
+  const finalSubtitle = document.getElementById('finalSubtitle');
+
+  if (allDone) {
+    finalCard.className = 'final-card unlocked';
+    lockIcon.textContent = '🏆';
+    finalSubtitle.textContent = 'All chapters complete — you\'re ready!';
+    finalBtn.disabled = false;
+    finalBtn.textContent = 'Take Final Exam →';
+    finalBtn.onclick = () => window.open(CONFIG.finalExamUrl, '_blank');
+  } else {
+    finalCard.className = 'final-card locked';
+    lockIcon.textContent = '🔒';
+    finalSubtitle.textContent = `Complete all 17 chapter quizzes to unlock (${count} done)`;
+    finalBtn.disabled = true;
+    finalBtn.textContent = 'Locked';
+    finalBtn.onclick = null;
+  }
+}
+
+function markDone(index) {
+  const data = loadProgress(currentStudent);
+  if (!data.done.includes(index)) {
+    data.done.push(index);
+    saveProgress(currentStudent, data);
+    showToast(`✅ ${CONFIG.chapters[index].title} marked complete!`);
+    renderMain();
+  }
+}
+
+// ── SWITCH STUDENT ─────────────────────────────
+document.getElementById('switchBtn').addEventListener('click', () => {
+  document.getElementById('resetModal').classList.add('open');
+});
+document.getElementById('cancelReset').addEventListener('click', () => {
+  document.getElementById('resetModal').classList.remove('open');
+});
+document.getElementById('confirmReset').addEventListener('click', () => {
+  document.getElementById('resetModal').classList.remove('open');
+  document.getElementById('mainScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  currentStudent = null;
+  buildLoginScreen();
+});
+
+// ── INIT ──────────────────────────────────────
+buildLoginScreen();
+</script>
+</body>
+</html>
