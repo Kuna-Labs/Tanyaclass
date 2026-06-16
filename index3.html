@@ -43,72 +43,10 @@
   .screen{display:none}
   .screen.active{display:block}
 
-  /* ════════════════════════════════
-     LOGIN SCREEN
-  ════════════════════════════════ */
-  #loginScreen{
-    min-height:100vh;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;padding:2rem;
-  }
-  #loginScreen.active{display:flex}
-
-  .login-card{
-    background:linear-gradient(170deg,#fdf8ec,#f0e6cc);
-    border:1px solid var(--gold);
-    border-radius:5px;
-    padding:40px 36px 44px;
-    width:100%;max-width:520px;
-    text-align:center;
-    box-shadow:0 30px 80px -20px rgba(0,0,0,.28);
-    position:relative;
-  }
-  .login-card::after{
-    content:"";position:absolute;inset:7px;border:1px solid rgba(168,132,44,.35);border-radius:2px;pointer-events:none;
-  }
-
-  .login-eyebrow{
-    font-family:'Archivo',sans-serif;text-transform:uppercase;letter-spacing:.42em;
-    font-size:.62rem;font-weight:600;color:var(--crimson);margin-bottom:14px;
-  }
-  .login-card h1{
-    font-family:'Frank Ruhl Libre',serif;font-weight:900;
-    font-size:clamp(1.8rem,6vw,2.8rem);color:var(--ink);line-height:1;
-    margin-bottom:8px;
-  }
-  .login-card .sub{
-    font-style:italic;color:#5a4a32;font-size:1rem;margin-bottom:6px;line-height:1.4;
-  }
   .rule{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 26px;max-width:260px}
   .rule .l{height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--gold))}
   .rule .r{height:1px;flex:1;background:linear-gradient(90deg,var(--gold),transparent)}
   .rule .d{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}
-
-  .student-grid{
-    display:grid;grid-template-columns:1fr 1fr;gap:8px;
-    max-height:300px;overflow-y:auto;margin-bottom:18px;padding-right:4px;
-  }
-  .student-grid::-webkit-scrollbar{width:4px}
-  .student-grid::-webkit-scrollbar-track{background:transparent}
-  .student-grid::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
-
-  .student-btn{
-    background:rgba(255,255,255,.45);
-    border:1px solid var(--line);border-radius:3px;
-    color:var(--ink);
-    font-family:'Archivo',sans-serif;font-size:.75rem;font-weight:600;
-    letter-spacing:.04em;text-transform:uppercase;
-    padding:.65rem .5rem;cursor:pointer;
-    transition:all .18s;text-align:center;line-height:1.3;
-  }
-  .student-btn:hover{border-color:var(--gold);background:rgba(201,162,39,.1)}
-  .student-btn.selected{
-    border-color:var(--crimson);background:rgba(122,39,24,.08);color:var(--crimson);
-    box-shadow:0 0 0 1px var(--crimson);
-  }
-  .progress-pill{
-    display:block;font-size:.6rem;letter-spacing:.08em;color:var(--teal);
-    font-weight:600;margin-top:2px;text-transform:uppercase;
-  }
 
   .btn{
     font-family:'Archivo',sans-serif;font-weight:600;letter-spacing:.08em;
@@ -122,8 +60,6 @@
   .btn-gold:hover{filter:brightness(1.06);transform:translateY(-1px)}
   .btn-gold:disabled{opacity:.38;cursor:not-allowed;transform:none;filter:none}
 
-  #enterBtn{width:100%;font-size:.88rem;padding:15px}
-
   /* ════════════════════════════════
      MAIN SCREEN
   ════════════════════════════════ */
@@ -135,27 +71,19 @@
     background:rgba(244,236,216,.92);backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
     padding:10px 22px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    display:flex;align-items:center;justify-content:flex-end;gap:12px;
   }
-  .sh-name{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:1rem;color:var(--ink)}
   .sh-progress{
-    flex:1;max-width:200px;text-align:right;
     font-family:'Archivo',sans-serif;font-size:.62rem;
     letter-spacing:.18em;text-transform:uppercase;color:#7a6a4a;font-weight:600;
+    text-align:right;
   }
-  .sh-bar-track{height:5px;background:var(--parchment-deep);border-radius:20px;overflow:hidden;margin-top:4px}
+  .sh-bar-track{height:5px;background:var(--parchment-deep);border-radius:20px;overflow:hidden;margin-top:4px;min-width:120px}
   .sh-bar-fill{
     height:100%;width:0;border-radius:20px;
     background:linear-gradient(90deg,var(--gold),var(--gold-bright));
     transition:width .6s cubic-bezier(.4,0,.2,1);
   }
-  #switchBtn{
-    background:none;border:1px solid var(--line);border-radius:3px;
-    color:#7a6a4a;font-family:'Archivo',sans-serif;font-size:.62rem;
-    letter-spacing:.15em;text-transform:uppercase;font-weight:600;
-    padding:.4rem .8rem;cursor:pointer;transition:.18s;
-  }
-  #switchBtn:hover{border-color:var(--crimson);color:var(--crimson)}
 
   /* ---- Page header ---- */
   header{text-align:center;padding:52px 0 28px;position:relative}
@@ -293,33 +221,6 @@
   .listen-toggle .lt{font-family:'Archivo',sans-serif;font-size:.78rem;letter-spacing:.05em;font-weight:600;text-transform:uppercase;color:var(--teal)}
   .track-note{font-style:italic;color:#9a875f;font-size:.88rem;text-align:center;margin-top:8px}
 
-  /* ── SWITCH MODAL ── */
-  .switch-overlay{
-    position:fixed;inset:0;background:rgba(26,20,16,.62);backdrop-filter:blur(3px);
-    z-index:60;display:none;align-items:center;justify-content:center;padding:20px;
-  }
-  .switch-overlay.open{display:flex}
-  .switch-modal{
-    background:linear-gradient(170deg,#fdf8ec,#f0e6cc);
-    border:1px solid var(--gold);border-radius:5px;
-    padding:32px 30px;max-width:360px;width:100%;text-align:center;
-    box-shadow:0 30px 80px -20px rgba(0,0,0,.4);
-    position:relative;
-  }
-  .switch-modal::after{content:"";position:absolute;inset:6px;border:1px solid rgba(168,132,44,.3);border-radius:2px;pointer-events:none}
-  .switch-modal h3{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:1.5rem;margin-bottom:.5rem}
-  .switch-modal p{font-style:italic;color:#5a4a32;font-size:.95rem;margin-bottom:1.4rem;line-height:1.4}
-  .switch-actions{display:flex;gap:.7rem}
-  .switch-actions button{
-    flex:1;padding:.7rem;border-radius:3px;font-weight:600;font-size:.78rem;
-    cursor:pointer;border:none;transition:.18s;
-    font-family:'Archivo',sans-serif;letter-spacing:.06em;text-transform:uppercase;
-  }
-  #confirmSwitch{background:linear-gradient(135deg,var(--crimson-deep),var(--crimson));color:#fff}
-  #confirmSwitch:hover{filter:brightness(1.08)}
-  #cancelSwitch{background:rgba(255,255,255,.5);color:var(--ink);border:1px solid var(--line) !important}
-  #cancelSwitch:hover{border-color:var(--gold) !important}
-
   /* ── TOAST ── */
   .toast{
     position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);
@@ -334,7 +235,6 @@
   @media(max-width:560px){
     .modal-inner{padding:26px 20px 32px}
     .reward{min-width:100%}
-    .login-card{padding:28px 18px 32px}
   }
 </style>
 </head>
@@ -345,7 +245,7 @@
 ═══════════════════════════════════════════ -->
 <script>
 const CONFIG = {
-  courseTitle: "Podcast Review Challenge",
+  courseTitle: "Tanya Review Mivtza",
   eyebrow: "Summer Review · Class Recordings",
   subtitle: "Listen to all seventeen class recordings and complete each chapter quiz — one by one, all summer long.",
 
@@ -353,22 +253,11 @@ const CONFIG = {
   reward1: { icon: "💵", label: "Upon completion", value: "$100 Reward" },
   reward2: { icon: "🎟️", label: "Plus an entry", value: "Grand Prize Raffle" },
 
-  // ── Student names ─────────────────────────
-  students: [
-    "Alice M.", "Bob T.", "Carlos R.", "Diana K.",
-    "Ethan J.", "Fatima S.", "Grace L.", "Henry W.",
-    "Isabella P.", "James C.", "Karen N.", "Liam B.",
-    "Mia F.", "Noah G.", "Olivia H.", "Pablo D.",
-    "Quinn A.", "Rachel E.", "Sam V.", "Tina O.",
-    "Ursula Y.", "Victor Z.", "Wendy X.", "Xander U.",
-    "Yara I.", "Zack Q."
-  ],
-
   // ── Chapter definitions ───────────────────
   // Replace googleFormUrl with your real Google Form links.
   // podcastUrl is optional — set to "" to hide the listen button.
   chapters: [
-    { title: "Chapter 1",  googleFormUrl: "https://forms.google.com/your-form-1",  podcastUrl: "" },
+    { title: "Chapter 1",  googleFormUrl: "https://forms.gle/o2wN5Cn59jnjGyoZ7",  podcastUrl: "" },
     { title: "Chapter 2",  googleFormUrl: "https://forms.google.com/your-form-2",  podcastUrl: "" },
     { title: "Chapter 3",  googleFormUrl: "https://forms.google.com/your-form-3",  podcastUrl: "" },
     { title: "Chapter 4",  googleFormUrl: "https://forms.google.com/your-form-4",  podcastUrl: "" },
@@ -397,31 +286,15 @@ const CONFIG = {
 ═══════════════════════════════════════════ -->
 
 <!-- ══════════════════════════════════
-     LOGIN SCREEN
-══════════════════════════════════ -->
-<div id="loginScreen" class="screen active">
-  <div class="login-card">
-    <div class="login-eyebrow" id="loginEyebrow"></div>
-    <h1 id="loginTitle"></h1>
-    <p class="sub" id="loginSub"></p>
-    <div class="rule"><span class="l"></span><span class="d"></span><span class="r"></span></div>
-    <div class="student-grid" id="studentGrid"></div>
-    <button class="btn btn-gold" id="enterBtn" disabled>Enter my tracker →</button>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════
      MAIN SCREEN
 ══════════════════════════════════ -->
-<div id="mainScreen" class="screen">
+<div id="mainScreen">
 
   <div class="site-header">
-    <span class="sh-name" id="headerName"></span>
     <div class="sh-progress">
       <div id="shLabel">0 / 17 complete</div>
       <div class="sh-bar-track"><div class="sh-bar-fill" id="shFill"></div></div>
     </div>
-    <button id="switchBtn">⇄ Switch</button>
   </div>
 
   <div class="wrap">
@@ -497,56 +370,34 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     SWITCH STUDENT MODAL
-══════════════════════════════════ -->
-<div class="switch-overlay" id="switchOverlay">
-  <div class="switch-modal">
-    <h3>Switch Student?</h3>
-    <p>You'll return to the student selection screen. Your progress is saved and will be waiting when you return.</p>
-    <div class="switch-actions">
-      <button id="cancelSwitch">Stay here</button>
-      <button id="confirmSwitch">Switch →</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 const TOTAL = CONFIG.chapters.length;
-let currentStudent = null;
+const STORAGE_KEY = 'podcast_tracker__progress';
 let currentChapterIdx = null;
-// state[student][i] = { submitted: bool }
-const state = {};
+let chapState = {};
 
 const $ = id => document.getElementById(id);
 
-// ── Helpers ──────────────────────────────────
-function storageKey(student, i) {
-  return `podcast_tracker__${student.replace(/\s+/g,'_')}__ch${i}`;
+// ── Storage ───────────────────────────────────
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
 }
 
-function loadState(student) {
-  const s = {};
-  for (let i = 0; i < TOTAL; i++) {
-    try {
-      const raw = localStorage.getItem(storageKey(student, i));
-      s[i] = raw ? JSON.parse(raw) : { submitted: false };
-    } catch { s[i] = { submitted: false }; }
-  }
-  return s;
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(chapState));
 }
 
-function saveChapter(student, i) {
-  localStorage.setItem(storageKey(student, i), JSON.stringify(state[student][i]));
+function doneCount() {
+  return Object.values(chapState).filter(v => v && v.submitted).length;
 }
 
-function doneCount(student) {
-  return Object.values(state[student]).filter(v => v.submitted).length;
-}
-
+// ── Toast ─────────────────────────────────────
 function showToast(msg) {
   const t = $('toast');
   t.textContent = msg;
@@ -554,17 +405,13 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-// ── Init static text ─────────────────────────
+// ── Static text ───────────────────────────────
 function initStaticText() {
-  $('loginEyebrow').textContent = CONFIG.eyebrow;
-  $('loginTitle').textContent   = CONFIG.courseTitle;
-  $('loginSub').textContent     = CONFIG.subtitle;
-  $('mainEyebrow').textContent  = CONFIG.eyebrow;
-  $('mainTitle').textContent    = CONFIG.courseTitle;
-  $('mainSub').textContent      = CONFIG.subtitle;
-  $('testBtn').textContent      = CONFIG.finalExamLabel;
+  $('mainEyebrow').textContent = CONFIG.eyebrow;
+  $('mainTitle').textContent   = CONFIG.courseTitle;
+  $('mainSub').textContent     = CONFIG.subtitle;
+  $('testBtn').textContent     = CONFIG.finalExamLabel;
 
-  // Rewards
   const rr = $('rewardRow');
   rr.innerHTML = '';
   [CONFIG.reward1, CONFIG.reward2].forEach(r => {
@@ -573,73 +420,35 @@ function initStaticText() {
   });
 }
 
-// ── LOGIN SCREEN ──────────────────────────────
-function buildLoginScreen() {
-  const grid = $('studentGrid');
-  grid.innerHTML = '';
-  let selected = null;
-  $('enterBtn').disabled = true;
-
-  CONFIG.students.forEach(name => {
-    if (!state[name]) state[name] = loadState(name);
-    const done = doneCount(name);
-    const btn = document.createElement('button');
-    btn.className = 'student-btn';
-    btn.innerHTML = name + (done > 0 ? `<span class="progress-pill">${done}/${TOTAL} done</span>` : '');
-    btn.addEventListener('click', () => {
-      grid.querySelectorAll('.student-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selected = name;
-      $('enterBtn').disabled = false;
-    });
-    grid.appendChild(btn);
-  });
-
-  $('enterBtn').onclick = () => { if (selected) enterAs(selected); };
-}
-
-function enterAs(student) {
-  currentStudent = student;
-  if (!state[student]) state[student] = loadState(student);
-  $('loginScreen').classList.remove('active');
-  $('mainScreen').classList.add('active');
-  $('headerName').textContent = student;
-  render();
-}
-
-// ── MAIN RENDER ───────────────────────────────
+// ── Render ────────────────────────────────────
 function render() {
-  const s = state[currentStudent];
-  const done = doneCount(currentStudent);
+  const done = doneCount();
   const allDone = done === TOTAL;
 
-  // Header bar
-  $('shLabel').textContent = `${done} / ${TOTAL} complete`;
-  $('shFill').style.width = `${(done / TOTAL) * 100}%`;
-
-  // Progress card
-  $('doneCount').textContent = done;
-  $('barFill').style.width = `${(done / TOTAL) * 100}%`;
+  $('shLabel').textContent     = `${done} / ${TOTAL} complete`;
+  $('shFill').style.width      = `${(done / TOTAL) * 100}%`;
+  $('doneCount').textContent   = done;
+  $('barFill').style.width     = `${(done / TOTAL) * 100}%`;
 
   // Grid
   const grid = $('chaptersGrid');
   grid.innerHTML = '';
   CONFIG.chapters.forEach((ch, i) => {
-    const done_ch = s[i] && s[i].submitted;
+    const isDone = chapState[i] && chapState[i].submitted;
     const chip = document.createElement('div');
-    chip.className = 'chip' + (done_ch ? ' done' : '');
+    chip.className = 'chip' + (isDone ? ' done' : '');
     chip.innerHTML = `
       <div class="num">Chapter</div>
       <div class="pk">${i + 1}</div>
-      <div class="title">${done_ch ? 'Submitted ✓' : `<span style="opacity:.5">${ch.title}</span>`}</div>
-      <div class="status">${done_ch ? 'Complete' : 'Not yet done'}</div>`;
+      <div class="title">${isDone ? 'Submitted ✓' : `<span style="opacity:.5">${ch.title}</span>`}</div>
+      <div class="status">${isDone ? 'Complete' : 'Not yet done'}</div>`;
     chip.onclick = () => openModal(i);
     grid.appendChild(chip);
   });
 
   // Finale
-  $('testBtn').disabled = !allDone;
-  $('finaleLock').textContent = allDone ? '🎉' : '🔒';
+  $('testBtn').disabled        = !allDone;
+  $('finaleLock').textContent  = allDone ? '🎉' : '🔒';
   if (allDone) {
     $('finaleTitle').textContent = 'You did it! The Final Test awaits.';
     $('finaleText').textContent  = 'All seventeen chapters are complete. Take the final test and claim your reward!';
@@ -653,16 +462,15 @@ function render() {
   }
 }
 
-// ── MODAL ─────────────────────────────────────
+// ── Modal ─────────────────────────────────────
 function openModal(i) {
   currentChapterIdx = i;
   const ch = CONFIG.chapters[i];
-  const submitted = state[currentStudent][i].submitted;
+  const submitted = chapState[i] && chapState[i].submitted;
 
   $('mChapter').textContent      = `Chapter ${i + 1}`;
   $('mChapterTitle').textContent = ch.title;
 
-  // Podcast button
   if (ch.podcastUrl) {
     $('podcastBtnWrap').style.display = 'block';
     $('podcastBtn').href = ch.podcastUrl;
@@ -670,13 +478,9 @@ function openModal(i) {
     $('podcastBtnWrap').style.display = 'none';
   }
 
-  // Form button
   $('formBtn').href = ch.googleFormUrl || '#';
-
-  // Toggle
   $('submittedToggle').classList.toggle('on', submitted);
   $('toggleBox').textContent = submitted ? '✓' : '';
-
   $('overlay').classList.add('open');
 }
 
@@ -687,12 +491,12 @@ function closeModal() {
 
 $('submittedToggle').onclick = () => {
   if (currentChapterIdx === null) return;
-  const was = state[currentStudent][currentChapterIdx].submitted;
-  state[currentStudent][currentChapterIdx].submitted = !was;
-  const now = state[currentStudent][currentChapterIdx].submitted;
+  if (!chapState[currentChapterIdx]) chapState[currentChapterIdx] = {};
+  const now = !chapState[currentChapterIdx].submitted;
+  chapState[currentChapterIdx].submitted = now;
   $('submittedToggle').classList.toggle('on', now);
   $('toggleBox').textContent = now ? '✓' : '';
-  saveChapter(currentStudent, currentChapterIdx);
+  saveState();
   if (now) showToast(`✓ Chapter ${currentChapterIdx + 1} marked complete!`);
   render();
 };
@@ -701,30 +505,18 @@ $('closeBtn').onclick = closeModal;
 $('overlay').onclick  = e => { if (e.target === $('overlay')) closeModal(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── SWITCH STUDENT ─────────────────────────────
-$('switchBtn').onclick = () => $('switchOverlay').classList.add('open');
-$('cancelSwitch').onclick = () => $('switchOverlay').classList.remove('open');
-$('confirmSwitch').onclick = () => {
-  $('switchOverlay').classList.remove('open');
-  $('mainScreen').classList.remove('active');
-  $('loginScreen').classList.add('active');
-  currentStudent = null;
-  buildLoginScreen();
-};
-
-// ── RESET ─────────────────────────────────────
+// ── Reset ─────────────────────────────────────
 $('resetBtn').onclick = () => {
-  if (!confirm(`Reset all progress for ${currentStudent}? This cannot be undone.`)) return;
-  for (let i = 0; i < TOTAL; i++) {
-    state[currentStudent][i] = { submitted: false };
-    saveChapter(currentStudent, i);
-  }
+  if (!confirm('Reset all your progress? This cannot be undone.')) return;
+  chapState = {};
+  saveState();
   render();
 };
 
-// ── BOOT ──────────────────────────────────────
+// ── Boot ──────────────────────────────────────
+chapState = loadState();
 initStaticText();
-buildLoginScreen();
+render();
 </script>
 </body>
 </html>
